@@ -1,0 +1,8 @@
+torch==2.0.1
+torchvision==0.15.1
+torchaudio==2.0.1
+numpy==1.24.0
+matplotlib==3.6.2
+pandas==1.5.3
+sentencepiece==0.1.96  # Optional, if needed for NLP tasks
+pytorch-lightning==1.9.0  # Optional, if needed for simplified training loops
