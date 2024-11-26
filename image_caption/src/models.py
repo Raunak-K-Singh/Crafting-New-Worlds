@@ -1,5 +1,8 @@
+import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import logging
+from typing import Dict, List
 
 class AdaptiveFeatureFusion(nn.Module):
     """Adaptive feature fusion layer that combines features from multiple sources."""
@@ -62,25 +65,28 @@ class EnhancedMultiModalAttention(nn.Module):
         self.key_layer = nn.Linear(config.hidden_size, self.num_attention_heads * self.attention_head_size)
         self.value_layer = nn.Linear(config.hidden_size, self.num_attention_heads * self.attention_head_size)
         
+        # Relative position embedding
         self.rel_pos_embedding = nn.Parameter(torch.randn(2 * config.max_caption_length - 1, self.attention_head_size))
         
+        # Layers for output processing
         self.dropout_layer = nn.Dropout(0.1)
         self.output_layer = nn.Linear(self.num_attention_heads * self.attention_head_size, config.hidden_size)
         
+        # Layer normalization
         self.layer_norm = nn.LayerNorm(config.hidden_size)
 
     def compute_position_bias(self, hidden_states):
-         seq_length=hidden_states.size(1) 
-         position_biases=self.rel_pos_embedding[:seq_length,:seq_length] 
+         seq_length = hidden_states.size(1) 
+         position_biases = self.rel_pos_embedding[:seq_length,:seq_length] 
          return position_biases.unsqueeze(0).expand(hidden_states.size(0), -1 , -1)
 
-     def forward(
+    def forward(
          self,
          hidden_states,
          attention_mask=None,
          output_attentions=False,
      ):
-         batch_size , seq_length , _=hidden_states.size()
+         batch_size , seq_length , _= hidden_states.size()
          
          query_layer=self.query_layer(hidden_states).view(
              batch_size , seq_length ,self.num_attention_heads ,self.attention_head_size 
@@ -133,19 +139,21 @@ class EnhancedImageEncoder(nn.Module):
        input_dims=[model.config.hidden_size for model in self.vision_models.values()]
        output_dim=2048 
        
+       # Feature fusion layer
        self.feature_fusion=AdaptiveFeatureFusion(input_dims=input_dims , output_dim=output_dim) 
        
        if config.enable_style_transfer:
+           # Style encoder
            self.style_encoder=VisualStyleEncoder(config) 
        
        if config.enable_emotion_detection:
+           # Emotion detector
            self.emotion_detector=EmotionDetector() 
 
    def forward(self,image)->Dict[str , torch.Tensor]:
        """Forward pass through the enhanced image encoder."""
        
        features={}
-       attention_maps={}
        
        for name , model in self.vision_models.items():
            try:
