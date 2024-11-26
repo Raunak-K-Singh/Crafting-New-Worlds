@@ -1,3 +1,5 @@
+# src/utils.py
+
 import os
 
 def create_directory(dir_path):
@@ -16,11 +18,13 @@ def load_config(file_path):
 
 def save_model(model, path):
     """Save a PyTorch model to the specified path."""
+    import torch
     torch.save(model.state_dict(), path)
     print(f"Model saved to {path}")
 
 def load_model(model, path):
     """Load a PyTorch model from the specified path."""
+    import torch
     model.load_state_dict(torch.load(path))
     model.eval()
     print(f"Model loaded from {path}")

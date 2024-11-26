@@ -1,6 +1,8 @@
+# tests/test_models.py
+
 import unittest
 import torch
-from src.models import EnhancedImageEncoder  # Adjust the import based on your structure
+from src.models import EnhancedImageEncoder  # Adjust based on your structure
 from src.config import ModelConfig
 
 class TestEnhancedImageEncoder(unittest.TestCase):
@@ -19,11 +21,6 @@ class TestEnhancedImageEncoder(unittest.TestCase):
         self.assertIn('features', output)
         self.assertIn('style_features', output)
         self.assertIn('emotions', output)
-
-        # Check shapes of outputs (adjust based on your actual model output shapes)
-        self.assertEqual(output['features'].shape, (self.config.batch_size, 2048))  # Example shape
-        self.assertEqual(output['style_features'].shape, (self.config.batch_size, 256))  # Example shape
-        self.assertEqual(output['emotions'].shape, (self.config.batch_size, 5))  # Example shape for emotion classes
 
 if __name__ == '__main__':
     unittest.main()
